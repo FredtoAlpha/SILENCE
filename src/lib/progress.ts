@@ -4,24 +4,32 @@ import { persist } from "zustand/middleware";
 export type ThemeId = "paper" | "night";
 export type FontScale = 0 | 1 | 2;
 
-type BookProgress = {
+export type BookProgress = {
   lastSlug: string | null;
   completed: number[];
 };
 
-type ProgressState = {
+export type ProgressSnapshot = {
   theme: ThemeId;
   fontScale: FontScale;
   lastBook: string | null;
   books: Record<string, BookProgress>;
+};
+
+type ProgressState = ProgressSnapshot & {
   setTheme: (theme: ThemeId) => void;
   setFontScale: (scale: FontScale) => void;
   markOpened: (book: string, slug: string, id: number) => void;
   markCompleted: (book: string, id: number) => void;
   reset: (book: string) => void;
+  replace: (progress: unknown) => void;
 };
 
 const emptyBook = (): BookProgress => ({ lastSlug: null, completed: [] });
+
+export function emptyProgress(): ProgressSnapshot {
+  return { theme: "paper", fontScale: 1, lastBook: null, books: {} };
+}
 
 export function bookProgress(
   books: Record<string, BookProgress> | undefined,
@@ -34,71 +42,106 @@ export function bookProgress(
   };
 }
 
+export function sanitizeProgress(progress: unknown): ProgressSnapshot {
+  if (!progress || typeof progress !== "object") return emptyProgress();
+  const raw = progress as Record<string, unknown>;
+  const books: Record<string, BookProgress> = {};
+  if (raw.books && typeof raw.books === "object") {
+    for (const [slug, value] of Object.entries(raw.books).slice(0, 100)) {
+      if (!/^[a-z0-9-]{1,80}$/.test(slug) || !value || typeof value !== "object") {
+        continue;
+      }
+      const item = value as Record<string, unknown>;
+      const completed = Array.isArray(item.completed)
+        ? [...new Set(item.completed.filter((id) => Number.isInteger(id) && id > 0 && id <= 200))]
+            .slice(0, 200)
+            .sort((a, b) => a - b)
+        : [];
+      books[slug] = {
+        lastSlug:
+          typeof item.lastSlug === "string" && /^[a-z0-9-]{1,80}$/.test(item.lastSlug)
+            ? item.lastSlug
+            : null,
+        completed,
+      };
+    }
+  }
+  return {
+    theme: raw.theme === "night" ? "night" : "paper",
+    fontScale: raw.fontScale === 0 || raw.fontScale === 2 ? raw.fontScale : 1,
+    lastBook:
+      typeof raw.lastBook === "string" && Object.hasOwn(books, raw.lastBook) ? raw.lastBook : null,
+    books,
+  };
+}
+
+export function progressSnapshot(state: ProgressState): ProgressSnapshot {
+  return sanitizeProgress(state);
+}
+
 export const useProgress = create<ProgressState>()(
   persist(
     (set) => ({
-      theme: "paper",
-      fontScale: 1,
-      lastBook: null,
-      books: {},
+      ...emptyProgress(),
       setTheme: (theme) => set({ theme }),
       setFontScale: (fontScale) => set({ fontScale }),
       markOpened: (book, slug) =>
-        set((s) => {
-          const prev = bookProgress(s.books, book);
+        set((state) => {
+          const previous = bookProgress(state.books, book);
           return {
             lastBook: book,
             books: {
-              ...s.books,
-              [book]: { ...prev, lastSlug: slug },
+              ...state.books,
+              [book]: { ...previous, lastSlug: slug },
             },
           };
         }),
       markCompleted: (book, id) =>
-        set((s) => {
-          const prev = bookProgress(s.books, book);
+        set((state) => {
+          const previous = bookProgress(state.books, book);
           return {
             lastBook: book,
             books: {
-              ...s.books,
+              ...state.books,
               [book]: {
-                ...prev,
-                completed: prev.completed.includes(id)
-                  ? prev.completed
-                  : [...prev.completed, id].sort((a, b) => a - b),
+                ...previous,
+                completed: previous.completed.includes(id)
+                  ? previous.completed
+                  : [...previous.completed, id].sort((a, b) => a - b),
               },
             },
           };
         }),
       reset: (book) =>
-        set((s) => {
-          const next = { ...s.books };
-          delete next[book];
+        set((state) => {
+          const books = { ...state.books };
+          delete books[book];
           return {
-            books: next,
-            lastBook: s.lastBook === book ? null : s.lastBook,
+            books,
+            lastBook: state.lastBook === book ? null : state.lastBook,
           };
         }),
+      replace: (progress) => set(sanitizeProgress(progress)),
     }),
     {
-      name: "prix-du-sucre-progress",
-      version: 2,
+      name: "silence-reading-progress",
+      version: 3,
       migrate: (persisted, version) => {
-        const p = persisted as Record<string, unknown>;
+        const previous = persisted as Record<string, unknown>;
         if (version < 2) {
-          const completed = Array.isArray(p.completed) ? (p.completed as number[]) : [];
-          const lastSlug = typeof p.lastSlug === "string" ? p.lastSlug : null;
-          return {
-            theme: p.theme === "night" ? "night" : "paper",
-            fontScale: p.fontScale === 0 || p.fontScale === 2 ? p.fontScale : 1,
+          const completed = Array.isArray(previous.completed)
+            ? (previous.completed as number[])
+            : [];
+          const lastSlug = typeof previous.lastSlug === "string" ? previous.lastSlug : null;
+          return sanitizeProgress({
+            theme: previous.theme,
+            fontScale: previous.fontScale,
             lastBook: completed.length || lastSlug ? "le-prix-du-sucre" : null,
             books:
-              completed.length || lastSlug
-                ? { "le-prix-du-sucre": { lastSlug, completed } }
-                : {},
-          };
+              completed.length || lastSlug ? { "le-prix-du-sucre": { lastSlug, completed } } : {},
+          });
         }
-        return p as unknown as ProgressState;
+        return sanitizeProgress(previous);
       },
     },
   ),

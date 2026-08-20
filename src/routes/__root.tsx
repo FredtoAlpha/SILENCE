@@ -1,6 +1,6 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
-import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { ReaderProfileProvider } from "@/components/reader-profile-provider";
 import { ThemeRoot } from "@/components/theme-root";
 import { AppErrorComponent } from "@/lib/error-component";
 import appCss from "../styles.css?url";
@@ -16,8 +16,7 @@ export const Route = createRootRoute({
       { name: "theme-color", content: "#1a1410" },
       {
         name: "description",
-        content:
-          "Feuilletons historiques pour le collège. À lire le soir, environ dix minutes.",
+        content: "Feuilletons historiques pour le collège. À lire le soir, environ dix minutes.",
       },
     ],
     links: [
@@ -35,10 +34,10 @@ export const Route = createRootRoute({
       </head>
       <body className="antialiased">
         <PreviewHostBridge />
-        <ThemeRoot />
-        <AuthProvider>
+        <ReaderProfileProvider>
+          <ThemeRoot />
           <Outlet />
-        </AuthProvider>
+        </ReaderProfileProvider>
         <Scripts />
       </body>
     </html>

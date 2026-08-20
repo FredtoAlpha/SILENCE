@@ -20,10 +20,7 @@ function asNiveau(raw: string | undefined): Niveau {
 }
 
 function asMatiere(raw: string | undefined): Matiere {
-  const n = (raw ?? "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "");
+  const n = (raw ?? "").toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
   if (n.startsWith("geo")) return "Géographie";
   if (n === "emc") return "EMC";
   if (n.startsWith("fran")) return "Français";
@@ -46,6 +43,13 @@ function parseEpisodeFile(filename: string, body: string): Episode {
   while (i < lines.length && !lines[i].trim()) i++;
   const placeWhen = (lines[i] ?? "").trim();
   i++;
+  while (i < lines.length && !lines[i].trim()) i++;
+  let image = "";
+  const imageLine = (lines[i] ?? "").trim().match(/^image:\s*(.+)$/i);
+  if (imageLine) {
+    image = imageLine[1];
+    i++;
+  }
   const rest = lines.slice(i).join("\n").trim();
   const paragraphs = rest
     .split(/\n\s*\n/)
@@ -55,8 +59,7 @@ function parseEpisodeFile(filename: string, body: string): Episode {
   const comma = placeWhen.indexOf(",");
   const place =
     comma > 0 ? placeWhen.slice(0, comma).trim() : placeWhen.replace(/,?\s*\d{4}$/, "").trim();
-  const when =
-    comma > 0 ? placeWhen.slice(comma + 1).trim() : year ? year[1] : "";
+  const when = comma > 0 ? placeWhen.slice(comma + 1).trim() : year ? year[1] : "";
   const idMatch = filename.match(/(\d+)/);
   const words = paragraphs.join(" ").split(/\s+/).length;
   return {
@@ -66,7 +69,7 @@ function parseEpisodeFile(filename: string, body: string): Episode {
     place,
     when,
     minutes: Math.max(8, Math.min(14, Math.round(words / 160) || 10)),
-    image: "",
+    image,
     paragraphs,
   };
 }
@@ -132,7 +135,8 @@ export function importedCatalog(): FeuilletonMeta[] {
       evenings: folder.episodes.length || Number(info.épisodes) || 6,
       minutes: 10,
       cover,
-      coverAlt: title,
+      coverAlt: info["texte alternatif"] || title,
+      hasMap: /^(oui|true|1)$/i.test(info.carte || ""),
       available: folder.episodes.length > 0,
     };
   });

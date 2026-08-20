@@ -1,0 +1,8 @@
+titre: Le prix du sucre
+niveau: 4e
+matière: Histoire
+accroche: Bordeaux, 1768. Deux navires larguent les amarres le même matin. Ils ne prennent pas la même route. Ils ramèneront la même chose.
+épisodes: 6
+couverture: /art/cover.jpg
+texte alternatif: Deux navires quittent les quais de Bordeaux à l’aube.
+carte: oui

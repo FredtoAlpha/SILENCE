@@ -23,8 +23,9 @@ function splitItalics(input: string): { em: boolean; value: string }[] {
 function splitTerms(
   value: string,
   used: Set<string>,
-): ( { kind: "text"; value: string } | { kind: "term"; value: string; def: string } )[] {
-  const out: ( { kind: "text"; value: string } | { kind: "term"; value: string; def: string } )[] = [];
+): ({ kind: "text"; value: string } | { kind: "term"; value: string; def: string })[] {
+  const out: ({ kind: "text"; value: string } | { kind: "term"; value: string; def: string })[] =
+    [];
   let rest = value;
   while (rest.length) {
     let hit: { at: number; key: string } | null = null;
@@ -48,9 +49,7 @@ function splitTerms(
     const def = GLOSSARY[hit.key];
     out.push({ kind: "term", value: hit.key, def });
     used.add(hit.key.toLowerCase());
-    const canon = Object.keys(GLOSSARY).find(
-      (k) => k.toLowerCase() === hit.key.toLowerCase(),
-    );
+    const canon = Object.keys(GLOSSARY).find((k) => k.toLowerCase() === hit.key.toLowerCase());
     if (canon) used.add(canon.toLowerCase());
     rest = rest.slice(hit.at + hit.key.length);
   }
@@ -86,9 +85,7 @@ function Term({ value, def }: { value: string; def: string }) {
           role="note"
           className="absolute top-[calc(100%+0.35rem)] left-1/2 z-20 w-[min(18rem,70vw)] -translate-x-1/2 rounded-lg border border-border bg-surface px-3 py-2 font-serif text-[0.85rem] leading-snug text-fg shadow-[0_8px_28px_rgba(26,20,16,0.18)]"
         >
-          <span className="mb-1 block font-display text-sm font-semibold text-accent">
-            {value}
-          </span>
+          <span className="mb-1 block font-display text-sm font-semibold text-accent">{value}</span>
           {def}
         </span>
       ) : null}
@@ -114,21 +111,23 @@ export function RichParagraphs({
         const raw = paragraphs[i] ?? "";
         const isDialogue = raw.startsWith("— ");
         const isRegister = raw.startsWith("«");
+        const isSubheading = /^ÉPILOGUE\s+[—–-]/i.test(raw);
         return (
           <p
             key={i}
             className={
-              isDialogue
-                ? "my-[0.85em] pl-1"
-                : isRegister
-                  ? "my-[1.1em] pl-4 text-fg-muted italic"
-                  : "my-[0.95em]"
+              isSubheading
+                ? "mt-12 mb-4 font-display text-xl font-semibold tracking-wide"
+                : isDialogue
+                  ? "my-[0.85em] pl-1"
+                  : isRegister
+                    ? "my-[1.1em] pl-4 text-fg-muted italic"
+                    : "my-[0.95em]"
             }
           >
             {segs.map((s, j) => {
               if (s.kind === "em") return <em key={j}>{s.value}</em>;
-              if (s.kind === "term")
-                return <Term key={j} value={s.value} def={s.def} />;
+              if (s.kind === "term") return <Term key={j} value={s.value} def={s.def} />;
               return <span key={j}>{s.value}</span>;
             })}
           </p>

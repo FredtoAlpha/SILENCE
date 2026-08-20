@@ -17,7 +17,6 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SommaireRouteImport } from './routes/sommaire'
 import { Route as LireSlugRouteImport } from './routes/lire.$slug'
 import { Route as LivreBookRouteImport } from './routes/livre.$book'
-import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as LivreBookIndexRouteImport } from './routes/livre.$book.index'
 import { Route as LivreBookCarteRouteImport } from './routes/livre.$book.carte'
 import { Route as LivreBookFinRouteImport } from './routes/livre.$book.fin'
@@ -64,11 +63,6 @@ const LivreBookRoute = LivreBookRouteImport.update({
   path: '/livre/$book',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
-  id: '/api/auth/$',
-  path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LivreBookIndexRoute = LivreBookIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -104,7 +98,6 @@ export interface FileRoutesByFullPath {
   '/sommaire': typeof SommaireRoute
   '/lire/$slug': typeof LireSlugRoute
   '/livre/$book': typeof LivreBookRouteWithChildren
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/livre/$book/carte': typeof LivreBookCarteRoute
   '/livre/$book/fin': typeof LivreBookFinRoute
   '/livre/$book/sommaire': typeof LivreBookSommaireRoute
@@ -119,7 +112,6 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/sommaire': typeof SommaireRoute
   '/lire/$slug': typeof LireSlugRoute
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/livre/$book/carte': typeof LivreBookCarteRoute
   '/livre/$book/fin': typeof LivreBookFinRoute
   '/livre/$book/sommaire': typeof LivreBookSommaireRoute
@@ -136,7 +128,6 @@ export interface FileRoutesById {
   '/sommaire': typeof SommaireRoute
   '/lire/$slug': typeof LireSlugRoute
   '/livre/$book': typeof LivreBookRouteWithChildren
-  '/api/auth/$': typeof ApiAuthSplatRoute
   '/livre/$book/carte': typeof LivreBookCarteRoute
   '/livre/$book/fin': typeof LivreBookFinRoute
   '/livre/$book/sommaire': typeof LivreBookSommaireRoute
@@ -154,7 +145,6 @@ export interface FileRouteTypes {
     | '/sommaire'
     | '/lire/$slug'
     | '/livre/$book'
-    | '/api/auth/$'
     | '/livre/$book/carte'
     | '/livre/$book/fin'
     | '/livre/$book/sommaire'
@@ -169,7 +159,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/sommaire'
     | '/lire/$slug'
-    | '/api/auth/$'
     | '/livre/$book/carte'
     | '/livre/$book/fin'
     | '/livre/$book/sommaire'
@@ -185,7 +174,6 @@ export interface FileRouteTypes {
     | '/sommaire'
     | '/lire/$slug'
     | '/livre/$book'
-    | '/api/auth/$'
     | '/livre/$book/carte'
     | '/livre/$book/fin'
     | '/livre/$book/sommaire'
@@ -202,7 +190,6 @@ export interface RootRouteChildren {
   SommaireRoute: typeof SommaireRoute
   LireSlugRoute: typeof LireSlugRoute
   LivreBookRoute: typeof LivreBookRouteWithChildren
-  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -261,13 +248,6 @@ declare module '@tanstack/react-router' {
       path: '/livre/$book'
       fullPath: '/livre/$book'
       preLoaderRoute: typeof LivreBookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/$': {
-      id: '/api/auth/$'
-      path: '/api/auth/$'
-      fullPath: '/api/auth/$'
-      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/livre/$book/': {
@@ -337,7 +317,6 @@ const rootRouteChildren: RootRouteChildren = {
   SommaireRoute: SommaireRoute,
   LireSlugRoute: LireSlugRoute,
   LivreBookRoute: LivreBookRouteWithChildren,
-  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
