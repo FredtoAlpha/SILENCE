@@ -28,3 +28,23 @@ test("prévient si les titres d’épisode manquent", () => {
   assert.equal(parsed.episodes.length, 0);
   assert.ok(parsed.warnings.length > 0);
 });
+
+test("lit la fiche Titre / Niveau / Matière / Accroche", () => {
+  const html = `
+    <p>Titre : Le sel de la mer</p>
+    <p>Niveau : 3e</p>
+    <p>Matière : Géographie</p>
+    <p>Accroche : Une côte, un bateau, une carte trop lisse.</p>
+    <h1>ÉPISODE 1 — La carte</h1>
+    <h2>Saint-Malo, 1824</h2>
+    <p>Premier paragraphe assez long pour passer le seuil.</p>
+    <p>Deuxième paragraphe.</p>
+    <p>Troisième paragraphe.</p>
+  `;
+  const parsed = parseFeuilletonHtml(html, "ignore.docx");
+  assert.equal(parsed.title, "Le sel de la mer");
+  assert.equal(parsed.niveau, "3e");
+  assert.equal(parsed.matiere, "Géographie");
+  assert.match(parsed.logline, /côte/);
+  assert.equal(parsed.episodes[0].place, "Saint-Malo");
+});

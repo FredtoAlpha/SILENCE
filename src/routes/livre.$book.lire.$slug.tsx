@@ -56,9 +56,11 @@ function EpisodePage() {
       />
 
       <article className="mx-auto w-full max-w-[40rem] px-5 pb-24 sm:px-8">
-        <figure className="mt-6 overflow-hidden rounded-xl">
-          <img src={episode.image} alt="" className="aspect-[16/9] w-full object-cover" />
-        </figure>
+        {episode.image ? (
+          <figure className="mt-6 overflow-hidden rounded-xl">
+            <img src={episode.image} alt="" className="aspect-[16/9] w-full object-cover" />
+          </figure>
+        ) : null}
 
         <header className="mt-8">
           <p className="font-display text-xs tracking-[0.22em] text-fg-muted uppercase">

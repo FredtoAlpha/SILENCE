@@ -73,8 +73,9 @@ function Atelier() {
           Word → feuilleton
         </h1>
         <p className="mt-4 font-serif text-[1.05rem] leading-relaxed text-fg-muted">
-          Tu écris dans Word. Tu déposes le fichier ici. L’app découpe les
-          épisodes toute seule — à condition que le document suive trois règles.
+          Télécharge le modèle, remplis-le, dépose-le sur GitHub dans{" "}
+          <span className="text-fg">inbox/4e/histoire/</span> (ou 3e,
+          géographie, EMC, français). L’étagère se met à jour toute seule.
         </p>
 
         <ol className="mt-8 space-y-3 border-y border-border py-6 font-serif text-[1.02rem] leading-relaxed">

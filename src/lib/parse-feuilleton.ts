@@ -115,6 +115,38 @@ function titleCaseFromHeading(text: string): string {
   return t;
 }
 
+function parseFiche(preamble: string[]): {
+  titre?: string;
+  niveau?: string;
+  matiere?: string;
+  accroche?: string;
+} {
+  const out: {
+    titre?: string;
+    niveau?: string;
+    matiere?: string;
+    accroche?: string;
+  } = {};
+  for (const raw of preamble) {
+    const m = raw.match(
+      /^(titre|niveau|mati[eè]re|accroche)\s*[:–—]\s*(.+)$/i,
+    );
+    if (!m) continue;
+    const key = m[1]
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{M}/gu, "");
+    const value = m[2].replace(/[*]/g, "").trim();
+    if (key === "titre") out.titre = value;
+    else if (key === "niveau") {
+      const n = value.match(/([3-6])/);
+      if (n) out.niveau = `${n[1]}e`;
+    } else if (key === "matiere") out.matiere = capitalizeMatiere(value);
+    else if (key === "accroche") out.accroche = value;
+  }
+  return out;
+}
+
 export function parseFeuilletonHtml(
   html: string,
   filename = "",
@@ -202,19 +234,27 @@ export function parseFeuilletonHtml(
   flushAfter();
 
   const preambleText = preamble.join("\n");
-  const niveauMatch = preambleText.match(/\b([3-6])(?:e|ème)\b/i);
-  const matiereMatch = preambleText.match(MATIERE_RE);
-  const niveau = niveauMatch ? `${niveauMatch[1]}e` : null;
+  const fiche = parseFiche(preamble);
 
-  let title = "";
+  const niveauMatch = fiche.niveau || preambleText.match(/\b([3-6])(?:e|ème)\b/i)?.[1];
+  const matiereMatch = fiche.matiere || preambleText.match(MATIERE_RE)?.[1];
+  const niveau = fiche.niveau
+    ? fiche.niveau
+    : niveauMatch
+      ? String(niveauMatch).replace(/ème/i, "e").replace(/^(\d)$/, "$1e")
+      : null;
+
+  let title = fiche.titre || "";
   const fileBase = filename.replace(/\.[^.]+$/, "").replace(/[_]+/g, " ");
   const strongTitle = preamble.find(
     (p) =>
       p.length > 8 &&
       p.length < 80 &&
-      !/nouvelle historique|épisode|classe de/i.test(p),
+      !/nouvelle historique|épisode|classe de|^(titre|niveau|matière|matiere|accroche)\s*:/i.test(
+        p,
+      ),
   );
-  if (strongTitle && !/six épisodes/i.test(strongTitle)) {
+  if (!title && strongTitle && !/six épisodes/i.test(strongTitle)) {
     title = strongTitle.replace(/[*]/g, "").trim();
   }
   if (!title && fileBase) {
@@ -227,7 +267,8 @@ export function parseFeuilletonHtml(
   if (!title && episodes[0]) title = episodes[0].title;
 
   const logline =
-    preamble.find((p) => /minute|soir|épisode/i.test(p))?.replace(/[*]/g, "").trim() ??
+    fiche.accroche ||
+    preamble.find((p) => /minute|soir|épisode/i.test(p))?.replace(/[*]/g, "").trim() ||
     "";
 
   if (episodes.length === 0) {
@@ -255,7 +296,7 @@ export function parseFeuilletonHtml(
     title,
     logline,
     niveau,
-    matiere: matiereMatch ? capitalizeMatiere(matiereMatch[1]) : null,
+    matiere: fiche.matiere || (matiereMatch ? capitalizeMatiere(matiereMatch) : null),
     episodes,
     afterword,
     warnings,
@@ -276,7 +317,7 @@ function capitalizeMatiere(raw: string): string {
 
 export function toContentFiles(
   parsed: ParsedFeuilleton,
-  opts?: { niveau?: string; matiere?: string },
+  opts?: { niveau?: string; matiere?: string; cover?: string },
 ): ContentFile[] {
   const niveau = (opts?.niveau || parsed.niveau || "4e").toLowerCase();
   const matiereSlug = slugify(opts?.matiere || parsed.matiere || "histoire");
@@ -289,8 +330,11 @@ export function toContentFiles(
     `matière: ${opts?.matiere || parsed.matiere || "Histoire"}`,
     `accroche: ${parsed.logline}`,
     `épisodes: ${parsed.episodes.length}`,
+    opts?.cover ? `couverture: ${opts.cover}` : "",
     "",
-  ].join("\n");
+  ]
+    .filter((line, i, arr) => line !== "" || i === arr.length - 1)
+    .join("\n");
 
   const files: ContentFile[] = [{ path: `${root}/info.txt`, body: info }];
 
@@ -308,7 +352,12 @@ export function toContentFiles(
 
   if (parsed.afterword.length) {
     const body = parsed.afterword
-      .flatMap((s) => [s.title, "", ...s.paragraphs.flatMap((p) => [p, ""]), ""])
+      .flatMap((s) => [
+        `# ${s.title}`,
+        "",
+        ...s.paragraphs.flatMap((p) => [p, ""]),
+        "",
+      ])
       .join("\n");
     files.push({ path: `${root}/vrai-et-invente.txt`, body });
   }

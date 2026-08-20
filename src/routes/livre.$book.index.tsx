@@ -22,11 +22,15 @@ function BookCover() {
 
   return (
     <main className="relative min-h-dvh overflow-hidden bg-ink text-paper">
-      <img
-        src={meta.cover}
-        alt={meta.coverAlt}
-        className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
-      />
+      {meta.cover ? (
+        <img
+          src={meta.cover}
+          alt={meta.coverAlt}
+          className="absolute inset-0 h-full w-full object-cover object-[center_30%]"
+        />
+      ) : (
+        <div className="absolute inset-0 bg-ink" />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/25" />
 
       <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-xl flex-col justify-end px-6 pb-10 pt-16 sm:px-8 sm:pb-14">

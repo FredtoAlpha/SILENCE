@@ -3,7 +3,11 @@ name: Importer un Word
 on:
   push:
     paths:
-      - "inbox/*.docx"
+      - "inbox/**/*.docx"
+      - "inbox/**/*.jpg"
+      - "inbox/**/*.jpeg"
+      - "inbox/**/*.png"
+      - "inbox/**/*.webp"
 
 jobs:
   import:
@@ -16,8 +20,8 @@ jobs:
         with:
           node-version: "22"
       - run: npm ci
-      - run: node --experimental-strip-types --no-warnings scripts/import-docx.mjs inbox/*.docx --out content
+      - run: node --experimental-strip-types --no-warnings scripts/import-docx.mjs --inbox
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Import feuilleton depuis Word"
-          file_pattern: content/**
+          file_pattern: content/** public/art/**

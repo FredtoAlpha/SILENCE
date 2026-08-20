@@ -6,6 +6,7 @@ import {
   type AfterSection,
   type Episode,
 } from "@/lib/book";
+import { importedCatalog, loadImported } from "@/lib/content-books";
 
 export type Niveau = "3e" | "4e";
 export type Matiere = "Histoire" | "Géographie" | "EMC" | "Français";
@@ -37,7 +38,7 @@ export type LoadedBook = {
   sources: { label: string; href: string }[];
 };
 
-export const CATALOG: FeuilletonMeta[] = [
+const HAND: FeuilletonMeta[] = [
   {
     slug: "le-prix-du-sucre",
     title: "Le prix du sucre",
@@ -57,6 +58,11 @@ export const CATALOG: FeuilletonMeta[] = [
   },
 ];
 
+export const CATALOG: FeuilletonMeta[] = [
+  ...HAND,
+  ...importedCatalog().filter((f) => !HAND.some((h) => h.slug === f.slug)),
+];
+
 const BOOKS: Record<string, Omit<LoadedBook, "meta">> = {
   "le-prix-du-sucre": {
     episodes: EPISODES,
@@ -71,8 +77,9 @@ export function getMeta(slug: string) {
 
 export function loadBook(slug: string): LoadedBook | null {
   const meta = getMeta(slug);
-  const body = BOOKS[slug];
-  if (!meta || !body || !meta.available) return null;
+  if (!meta || !meta.available) return null;
+  const body = BOOKS[slug] ?? loadImported(slug);
+  if (!body) return null;
   return { meta, ...body };
 }
 

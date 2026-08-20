@@ -4,7 +4,6 @@ import { Moon, Sun } from "lucide-react";
 import {
   CATALOG,
   MATIERES,
-  NIVEAUX,
   filterCatalog,
   type Matiere,
   type Niveau,
@@ -102,7 +101,12 @@ function Library() {
         )}
 
         <p className="mt-16 text-sm text-fg-muted">
-          {CATALOG.filter((f) => f.available).length} titre · 3e et 4e
+          {CATALOG.filter((f) => f.available).length} titre
+          {CATALOG.filter((f) => f.available).length > 1 ? "s" : ""} · 3e et 4e
+          {" · "}
+          <Link to="/atelier" className="underline-offset-4 hover:underline">
+            Modèle Word
+          </Link>
         </p>
       </main>
     </div>
@@ -163,11 +167,19 @@ function BookCard({
   return (
     <Link to="/livre/$book" params={{ book: f.slug }} className="group block">
       <div className="relative overflow-hidden rounded-lg bg-ink shadow-[0_18px_40px_-24px_rgba(26,20,16,0.55)]">
-        <img
-          src={f.cover}
-          alt={f.coverAlt}
-          className="aspect-[2/3] w-full object-cover object-[center_42%] transition-transform duration-500 ease-[var(--ease-out)] group-hover:scale-[1.03]"
-        />
+        {f.cover ? (
+          <img
+            src={f.cover}
+            alt={f.coverAlt}
+            className="aspect-[2/3] w-full object-cover object-[center_42%] transition-transform duration-500 ease-[var(--ease-out)] group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="flex aspect-[2/3] w-full items-end bg-ink px-4 pb-5">
+            <p className="font-display text-xl leading-tight font-semibold text-paper">
+              {f.title}
+            </p>
+          </div>
+        )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-transparent" />
         {started ? (
           <div className="absolute right-0 bottom-0 left-0 h-[3px] bg-ink/40">
