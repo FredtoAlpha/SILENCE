@@ -35,7 +35,7 @@ function Afterword() {
             Le vrai et l’inventé
           </h1>
           <p className="mt-4 font-serif text-[1.08rem] leading-relaxed text-fg-muted">
-            Tu as lu une histoire. Voici ce qui reste quand on referme le livre.
+            Les faits historiques, les éléments inventés et les mots utiles.
           </p>
         </header>
 
@@ -68,11 +68,6 @@ function Afterword() {
             </ul>
           </section>
         ) : null}
-
-        <p className="mt-14 font-display text-lg text-fg-muted italic">
-          Si ces pages t’ont traversé, parle-en à quelqu’un. L’histoire tient
-          mieux à deux que seule, le soir.
-        </p>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           {meta.hasMap ? (

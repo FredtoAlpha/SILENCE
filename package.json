@@ -13,7 +13,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --no-warnings --test scripts/parse-feuilleton.test.mjs",
+    "test": "node --experimental-strip-types --no-warnings --test scripts/*.test.mjs",
     "import:docx": "node --experimental-strip-types --no-warnings scripts/import-docx.mjs",
     "modele:docx": "node scripts/make-modele-docx.mjs",
     "lint": "eslint .",

@@ -26,8 +26,7 @@ export type ContentFile = { path: string; body: string };
 
 const EPISODE_RE = /épisode\s*(\d+)\s*[—–\-]\s*(.+)/i;
 const AFTER_RE = /après\s+la\s+nouvelle/i;
-const MATIERE_RE =
-  /\b(histoire|géographie|geographie|emc|français|francais|arts?\s*plastiques)\b/i;
+const MATIERE_RE = /\b(histoire|géographie|geographie|emc|français|francais|arts?\s*plastiques)\b/i;
 
 export function slugify(input: string): string {
   return input
@@ -48,9 +47,7 @@ function decodeEntities(raw: string): string {
     .replace(/"/g, '"')
     .replace(/&#39;|'/g, "'")
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, n) =>
-      String.fromCharCode(parseInt(n, 16)),
-    );
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
 }
 
 function stripTagsKeepEm(html: string): string {
@@ -85,12 +82,13 @@ function splitPlaceWhen(heading: string): { place: string; when: string } {
 type Block =
   | { kind: "h1"; text: string }
   | { kind: "h2"; text: string }
+  | { kind: "h3"; text: string }
   | { kind: "p"; text: string };
 
 function tokenize(html: string): Block[] {
   const clean = html.replace(/<img[^>]*>/gi, "");
   const blocks: Block[] = [];
-  const re = /<(h1|h2|p)(\s[^>]*)?>([\s\S]*?)<\/\1>/gi;
+  const re = /<(h1|h2|h3|p)(\s[^>]*)?>([\s\S]*?)<\/\1>/gi;
   let m: RegExpExecArray | null;
   while ((m = re.exec(clean))) {
     const tag = m[1].toLowerCase();
@@ -98,6 +96,7 @@ function tokenize(html: string): Block[] {
     if (!text) continue;
     if (tag === "h1") blocks.push({ kind: "h1", text });
     else if (tag === "h2") blocks.push({ kind: "h2", text });
+    else if (tag === "h3") blocks.push({ kind: "h3", text });
     else blocks.push({ kind: "p", text });
   }
   return blocks;
@@ -106,8 +105,7 @@ function tokenize(html: string): Block[] {
 function titleCaseFromHeading(text: string): string {
   const t = text.replace(/\s+/g, " ").replace(/[*]/g, "").trim();
   const letters = t.replace(/[^A-Za-zÀ-ÿ]/g, "");
-  const isAllCaps =
-    letters.length > 0 && letters === letters.toUpperCase();
+  const isAllCaps = letters.length > 0 && letters === letters.toUpperCase();
   if (isAllCaps) {
     const lower = t.toLowerCase();
     return lower.charAt(0).toUpperCase() + lower.slice(1);
@@ -128,14 +126,9 @@ function parseFiche(preamble: string[]): {
     accroche?: string;
   } = {};
   for (const raw of preamble) {
-    const m = raw.match(
-      /^(titre|niveau|mati[eè]re|accroche)\s*[:–—]\s*(.+)$/i,
-    );
+    const m = raw.match(/^(titre|niveau|mati[eè]re|accroche)\s*[:–—]\s*(.+)$/i);
     if (!m) continue;
-    const key = m[1]
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/\p{M}/gu, "");
+    const key = m[1].toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
     const value = m[2].replace(/[*]/g, "").trim();
     if (key === "titre") out.titre = value;
     else if (key === "niveau") {
@@ -147,10 +140,7 @@ function parseFiche(preamble: string[]): {
   return out;
 }
 
-export function parseFeuilletonHtml(
-  html: string,
-  filename = "",
-): ParsedFeuilleton {
+export function parseFeuilletonHtml(html: string, filename = ""): ParsedFeuilleton {
   const warnings: string[] = [];
   const blocks = tokenize(html);
   const preamble: string[] = [];
@@ -166,7 +156,7 @@ export function parseFeuilletonHtml(
     currentEp = null;
   };
   const flushAfter = () => {
-    if (currentAfter) afterword.push(currentAfter);
+    if (currentAfter?.paragraphs.length) afterword.push(currentAfter);
     currentAfter = null;
   };
 
@@ -241,7 +231,9 @@ export function parseFeuilletonHtml(
   const niveau = fiche.niveau
     ? fiche.niveau
     : niveauMatch
-      ? String(niveauMatch).replace(/ème/i, "e").replace(/^(\d)$/, "$1e")
+      ? String(niveauMatch)
+          .replace(/ème/i, "e")
+          .replace(/^(\d)$/, "$1e")
       : null;
 
   let title = fiche.titre || "";
@@ -268,13 +260,14 @@ export function parseFeuilletonHtml(
 
   const logline =
     fiche.accroche ||
-    preamble.find((p) => /minute|soir|épisode/i.test(p))?.replace(/[*]/g, "").trim() ||
+    preamble
+      .find((p) => /minute|soir|épisode/i.test(p))
+      ?.replace(/[*]/g, "")
+      .trim() ||
     "";
 
   if (episodes.length === 0) {
-    warnings.push(
-      "Aucun épisode trouvé. Dans Word, utilise Titre 1 : « ÉPISODE 1 — Titre ».",
-    );
+    warnings.push("Aucun épisode trouvé. Dans Word, utilise Titre 1 : « ÉPISODE 1 — Titre ».");
   }
   for (const ep of episodes) {
     if (ep.paragraphs.length < 3) {
@@ -304,10 +297,7 @@ export function parseFeuilletonHtml(
 }
 
 function capitalizeMatiere(raw: string): string {
-  const n = raw
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "");
+  const n = raw.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
   if (n.startsWith("hist")) return "Histoire";
   if (n.startsWith("geo")) return "Géographie";
   if (n === "emc") return "EMC";
@@ -352,12 +342,7 @@ export function toContentFiles(
 
   if (parsed.afterword.length) {
     const body = parsed.afterword
-      .flatMap((s) => [
-        `# ${s.title}`,
-        "",
-        ...s.paragraphs.flatMap((p) => [p, ""]),
-        "",
-      ])
+      .flatMap((s) => [`# ${s.title}`, "", ...s.paragraphs.flatMap((p) => [p, ""]), ""])
       .join("\n");
     files.push({ path: `${root}/vrai-et-invente.txt`, body });
   }
@@ -366,11 +351,7 @@ export function toContentFiles(
 }
 
 export function toSingleTxt(parsed: ParsedFeuilleton): string {
-  const lines: string[] = [
-    parsed.title.toUpperCase(),
-    parsed.logline,
-    "",
-  ];
+  const lines: string[] = [parsed.title.toUpperCase(), parsed.logline, ""];
   for (const ep of parsed.episodes) {
     lines.push("");
     lines.push(`ÉPISODE ${ep.id} — ${ep.title.toUpperCase()}`);
