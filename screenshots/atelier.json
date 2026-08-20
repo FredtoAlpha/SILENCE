@@ -1,0 +1,35 @@
+{
+  "url": "http://127.0.0.1:8080/atelier",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Le prix du sucre",
+      "hasCanvas": false,
+      "bodyTextLen": 683,
+      "bodyTextHash": "e58cce88cdb6d08427a9fa650ca5252e40c43560b312958046a79b6d0a937f55",
+      "bodyTextPrefix": "Atelier Word AUTEUR · PAS POUR LES ÉLÈVES Word → feuilleton Tu é",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/atelier.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Le prix du sucre",
+      "hasCanvas": false,
+      "bodyTextLen": 683,
+      "bodyTextHash": "e58cce88cdb6d08427a9fa650ca5252e40c43560b312958046a79b6d0a937f55",
+      "bodyTextPrefix": "Atelier Word AUTEUR · PAS POUR LES ÉLÈVES Word → feuilleton Tu é",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/atelier-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "verdictFile": "/workspace/screenshots/atelier.json"
+}

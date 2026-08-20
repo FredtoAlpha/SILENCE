@@ -1,0 +1,23 @@
+name: Importer un Word
+
+on:
+  push:
+    paths:
+      - "inbox/*.docx"
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci
+      - run: node --experimental-strip-types --no-warnings scripts/import-docx.mjs inbox/*.docx --out content
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Import feuilleton depuis Word"
+          file_pattern: content/**

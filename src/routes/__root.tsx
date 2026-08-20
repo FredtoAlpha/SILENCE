@@ -1,0 +1,46 @@
+import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { AuthProvider } from "@/lib/auth/provider";
+import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { ThemeRoot } from "@/components/theme-root";
+import { AppErrorComponent } from "@/lib/error-component";
+import appCss from "../styles.css?url";
+
+const APP_NAME = "Feuilletons";
+
+export const Route = createRootRoute({
+  head: () => ({
+    meta: [
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: APP_NAME },
+      { name: "theme-color", content: "#1a1410" },
+      {
+        name: "description",
+        content:
+          "Feuilletons historiques pour le collège. À lire le soir, environ dix minutes.",
+      },
+    ],
+    links: [
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/__grok/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
+    ],
+  }),
+  errorComponent: AppErrorComponent,
+  component: () => (
+    <html lang="fr" data-theme="paper" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body className="antialiased">
+        <PreviewHostBridge />
+        <ThemeRoot />
+        <AuthProvider>
+          <Outlet />
+        </AuthProvider>
+        <Scripts />
+      </body>
+    </html>
+  ),
+});

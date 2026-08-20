@@ -1,0 +1,128 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Cormorant Garamond", "Palatino Linotype", Palatino, serif;
+  --font-serif: "Source Serif 4", "Iowan Old Style", "Palatino Linotype", serif;
+  --font-sans: "Source Serif 4", "Iowan Old Style", serif;
+
+  --color-paper: #f3ead9;
+  --color-paper-2: #e7dcc6;
+  --color-ink: #1a1410;
+  --color-ink-soft: #3c322a;
+  --color-muted: #6d5f52;
+  --color-rule: #c9b89a;
+  --color-wine: #6e2430;
+  --color-stone: #9a8870;
+  --color-night: #120e0c;
+  --color-night-2: #1c1612;
+  --color-night-ink: #efe4d2;
+  --color-night-muted: #b3a28c;
+
+  --color-bg: var(--color-paper);
+  --color-fg: var(--color-ink);
+  --color-fg-muted: var(--color-muted);
+  --color-surface: var(--color-paper-2);
+  --color-border: var(--color-rule);
+  --color-accent: var(--color-wine);
+  --color-accent-fg: #f3ead9;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+  }
+
+  html[data-theme="paper"] {
+    --color-bg: var(--color-paper);
+    --color-fg: var(--color-ink);
+    --color-fg-muted: var(--color-muted);
+    --color-surface: var(--color-paper-2);
+    --color-border: var(--color-rule);
+    --color-accent: var(--color-wine);
+    --color-accent-fg: var(--color-paper);
+    color-scheme: light;
+  }
+
+  html[data-theme="night"] {
+    --color-bg: var(--color-night);
+    --color-fg: var(--color-night-ink);
+    --color-fg-muted: var(--color-night-muted);
+    --color-surface: var(--color-night-2);
+    --color-border: #3a3028;
+    --color-accent: #c46a74;
+    --color-accent-fg: var(--color-night);
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-serif);
+    transition:
+      background-color 250ms var(--ease-out),
+      color 250ms var(--ease-out);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    font-family: var(--font-display);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 28%, transparent);
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

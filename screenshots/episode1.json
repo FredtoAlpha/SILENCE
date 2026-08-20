@@ -1,0 +1,35 @@
+{
+  "url": "http://127.0.0.1:8080/lire/deux-navires",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Le prix du sucre",
+      "hasCanvas": false,
+      "bodyTextLen": 5643,
+      "bodyTextHash": "f119d7d32faead5f3d2674820b9d10bd946c17a116cf12e784e525cdefcd4378",
+      "bodyTextPrefix": "1 / 6 · Deux navires ÉPISODE 1 · 10 MIN Deux navires Bordeaux·17",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/episode1.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Le prix du sucre",
+      "hasCanvas": false,
+      "bodyTextLen": 5628,
+      "bodyTextHash": "7bdaf04625e73c9ebe29ff3c897a59df9d8f5229820c8cdced2be5b3f0ef0b58",
+      "bodyTextPrefix": "1 / 6 ÉPISODE 1 · 10 MIN Deux navires Bordeaux·1768 À l’aube, la",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/episode1-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "verdictFile": "/workspace/screenshots/episode1.json"
+}

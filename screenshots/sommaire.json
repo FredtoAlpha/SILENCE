@@ -1,0 +1,35 @@
+{
+  "url": "http://127.0.0.1:8080/sommaire",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Le prix du sucre",
+      "hasCanvas": false,
+      "bodyTextLen": 761,
+      "bodyTextHash": "60a50e37b807e1dba65e3f30cfe0f69171fe03fd62053daabce69b683d1be296",
+      "bodyTextPrefix": "Sommaire NOUVELLE HISTORIQUE Six soirs Cette histoire se lit en ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/sommaire.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Le prix du sucre",
+      "hasCanvas": false,
+      "bodyTextLen": 761,
+      "bodyTextHash": "60a50e37b807e1dba65e3f30cfe0f69171fe03fd62053daabce69b683d1be296",
+      "bodyTextPrefix": "Sommaire NOUVELLE HISTORIQUE Six soirs Cette histoire se lit en ",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/sommaire-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "verdictFile": "/workspace/screenshots/sommaire.json"
+}
